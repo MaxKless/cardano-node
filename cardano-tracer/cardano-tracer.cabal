@@ -41,10 +41,11 @@ library
                        Cardano.Tracer.Run
                        Cardano.Tracer.Types
 
+                       Cardano.Tracer.Handlers.Logs.File
+                       Cardano.Tracer.Handlers.Logs.Journal
                        Cardano.Tracer.Handlers.Logs.Log
                        Cardano.Tracer.Handlers.Logs.Rotator
                        Cardano.Tracer.Handlers.Logs.Run
-                       Cardano.Tracer.Handlers.Logs.Write
                        Cardano.Tracer.Handlers.Metrics.Run
 
   other-modules:       Paths_cardano_tracer
@@ -61,6 +62,7 @@ library
                        , filepath
                        , hashable
                        , iohk-monitoring
+                       , libsystemd-journal
                        , network
                        , optparse-applicative
                        , ouroboros-network-framework

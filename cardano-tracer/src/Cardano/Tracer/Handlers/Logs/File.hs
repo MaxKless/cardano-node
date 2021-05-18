@@ -4,7 +4,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Cardano.Tracer.Handlers.Logs.Write
+module Cardano.Tracer.Handlers.Logs.File
   ( writeLogObjectsToFile
   ) where
 
@@ -94,22 +94,22 @@ loToText (LogObject loname lometa loitem) =
   time = TL.pack . formatTime defaultTimeLocale "%F %T%2Q %Z" $ tstamp lometa
   msg =
     case loitem of
-      (LogMessage logItem) ->
+      LogMessage logItem ->
         case toJSON logItem of
-          (String m) -> TL.fromStrict m
-          m          -> encodeToLazyText m
-      (LogError m) -> TL.fromStrict m
-      (LogStructured o) -> encodeToLazyText o
-      (LogStructuredText _o m) -> TL.fromStrict m
-      (LogValue name' value) ->
+          String m -> TL.fromStrict m
+          m        -> encodeToLazyText m
+      LogError m -> TL.fromStrict m
+      LogStructured o -> encodeToLazyText o
+      LogStructuredText _o m -> TL.fromStrict m
+      LogValue name' value ->
         if T.null name'
           then TL.pack (show value)
           else TL.fromStrict name' <> " = " <> TL.pack (show value)
-      (ObserveDiff _) -> encodeToLazyText loitem
-      (ObserveOpen _) -> encodeToLazyText loitem
-      (ObserveClose _) -> encodeToLazyText loitem
-      (AggregatedMessage _) -> encodeToLazyText loitem
-      (MonitoringEffect _) -> encodeToLazyText loitem
+      ObserveDiff _ -> encodeToLazyText loitem
+      ObserveOpen _ -> encodeToLazyText loitem
+      ObserveClose _ -> encodeToLazyText loitem
+      AggregatedMessage _ -> encodeToLazyText loitem
+      MonitoringEffect _ -> encodeToLazyText loitem
       KillPill -> ""
       Command _ -> ""
 

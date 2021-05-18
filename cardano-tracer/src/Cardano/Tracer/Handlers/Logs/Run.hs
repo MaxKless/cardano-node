@@ -24,8 +24,9 @@ import           Trace.Forward.Protocol.Type (NodeInfoStore)
 import           Cardano.Tracer.Configuration
 import           Cardano.Tracer.Types (AcceptedItems, LogObjects, Metrics,
                                        NodeId, NodeName, getNodeName)
+import           Cardano.Tracer.Handlers.Logs.File (writeLogObjectsToFile)
+import           Cardano.Tracer.Handlers.Logs.Journal (writeLogObjectsToJournal)
 import           Cardano.Tracer.Handlers.Logs.Rotator (runLogsRotator)
-import           Cardano.Tracer.Handlers.Logs.Write (writeLogObjectsToFile)
 
 runLogsHandler
   :: TracerConfig
@@ -34,7 +35,7 @@ runLogsHandler
 runLogsHandler config acceptedItems = do
   rotThr <- async $ runLogsRotator config
   void . forever $ do
-    threadDelay 2000000 -- Take 'LogObject's from the queue every 2 seconds.
+    threadDelay 1000000 -- Take 'LogObject's from the queue every second.
     itemsFromAllNodes <- HM.toList <$> readIORef acceptedItems
     forConcurrently_ itemsFromAllNodes $ handleItemsFromNode config
   uninterruptibleCancel rotThr
@@ -64,7 +65,5 @@ writeLogObjects _ _ _ [] = return ()
 writeLogObjects config nodeId nodeName logObjects =
   forM_ (logging config) $ \LoggingParams{..} ->
     case logMode of
-      FileMode ->
-        writeLogObjectsToFile nodeId nodeName logRoot logFormat logObjects
-      JournalMode ->
-        undefined -- writeLogObjectsToJournal logRoot logFormat
+      FileMode    -> writeLogObjectsToFile nodeId nodeName logRoot logFormat logObjects
+      JournalMode -> writeLogObjectsToJournal nodeId nodeName logObjects
