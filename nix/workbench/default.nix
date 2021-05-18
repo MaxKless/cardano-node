@@ -10,6 +10,7 @@
 , customConfig
 , cardano-cli
 , cardano-topology
+, locli
 
 , useCabalRun
 }:
@@ -45,6 +46,7 @@ let
 
             cardano-cli
             cardano-topology
+            locli
           ]}
       '';
 
@@ -112,7 +114,11 @@ let
       ${exeCabalOp "exec" "cardano-topology"} "$@"
     }
 
-    export -f cardano-cli cardano-node cardano-topology
+    function locli() {
+      ${exeCabalOp "exec" "locli"} "$@"
+    }
+
+    export -f cardano-cli cardano-node cardano-topology locli
 
     ''}
 
@@ -121,7 +127,7 @@ let
         ''
       git log -n1 --alternate-refs --pretty=format:"%Cblue%h %Cred%cr %Cgreen%D %Cblue%s%Creset"
       echo -n "workbench:  prebuilding executables (because of useCabalRun):"
-      for exe in cardano-cli cardano-node cardano-topology
+      for exe in cardano-cli cardano-node cardano-topology locli
       do echo -n " $exe"
          cabal -v0 build exe:$exe >/dev/null || return 1
       done
